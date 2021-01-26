@@ -3,11 +3,14 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 	private $errors = [];
 	private $user_token;
 	private $version = '3.0.3.6.RE9';
+	private $author_name = 'Hkr';
+	private $author_link = 'https://forum.opencart.name/members/hkr.3/';
+	private $extension_link = 'https://forum.opencart.name/resources/';
 
 	public function __construct($registry) {
 		parent::__construct($registry);
 
-		$this->user_token = 'user_token=' . $this->session->data['user_token'];
+		$this->user_token = $this->session->data['user_token'];
 	}
 
 	public function install() {
@@ -32,52 +35,87 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true));
+			$this->response->redirect($this->getFullLink('marketplace/extension', ['type' => 'module']));
 		}
 
-		if (isset($this->error['warning'])) {
-			$data['error_warning'] = $this->error['warning'];
+		// Errors
+		if (isset($this->errors['warning'])) {
+			$data['error_warning'] = $this->errors['warning'];
 		} else {
 			$data['error_warning'] = '';
 		}
 
-		$data['breadcrumbs'] = [
-			[
-				'text' => $this->language->get('text_home'),
-				'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
-			],
-			[
-				'text' => $this->language->get('text_extension'),
-				'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true)
-			],
-			[
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/assembly_configurator', 'user_token=' . $this->session->data['user_token'], true)
-			]
-		];
+		$data['breadcrumbs'] = $this->getBreadcrumbs('extension/module/assembly_configurator');
+		$data['data_version'] = $this->version;
 
-		$data['action'] = $this->url->link('extension/module/assembly_configurator', 'user_token=' . $this->session->data['user_token'], true);
+		$data['url_action'] = $this->getFullLink('extension/module/assembly_configurator');
+		$data['url_cancel'] = $this->getFullLink('marketplace/extension', ['type' => 'module']);
 
-		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
 
-		if (isset($this->request->post['module_assembly_configurator_status'])) {
-			$data['module_assembly_configurator_status'] = $this->request->post['module_assembly_configurator_status'];
-		} else {
-			$data['module_assembly_configurator_status'] = $this->config->get('module_assembly_configurator_status');
-		}
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
+
+		// Views
+		$data['view_tab_info'] = $this->viewTabInfo();
+		$data['view_tab_general'] = $this->viewTabGeneral();
 
 		$this->response->setOutput($this->load->view('extension/module/assembly_configurator', $data));
 	}
 
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/module/assembly_configurator')) {
-			$this->error['warning'] = $this->language->get('error_permission');
+			$this->errors['warning'] = $this->language->get('error_permission');
 		}
 
-		return !$this->error;
+		return !$this->errors;
+	}
+
+	private function viewTabGeneral() {
+		$data['module_assembly_configurator_status'] = isset($this->request->post['module_assembly_configurator_status'])
+			? $this->request->post['module_assembly_configurator_status']
+			: $this->config->get('module_assembly_configurator_status');
+
+		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_general', $data);
+	}
+
+	private function viewTabInfo() {
+		$data = [
+			'data_extension_name' => $this->language->get('heading_title'),
+			'url_extension_link' => $this->extension_link,
+			'data_author_name' => $this->author_name,
+			'url_author_link' => $this->author_link,
+			'data_version' => $this->version,
+		];
+
+		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_info', $data);
+	}
+
+	private function getBreadcrumbs($module) {
+		return [
+			[
+				'text' => $this->language->get('text_home'),
+				'href' => $this->getFullLink('common/dashboard')
+			],
+			[
+				'text' => $this->language->get('text_extension'),
+				'href' => $this->getFullLink('marketplace/extension', ['type' => 'module'])
+			],
+			[
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->getFullLink($module)
+			]
+		];
+	}
+
+	private function getFullLink($module, $params = []) {
+		$url = '';
+		foreach ($params as $key => $value) {
+			$url .= '&' . $key . '=' . $value;
+		}
+		$url .= '&user_token=' . $this->user_token;
+
+		return $this->url->link($module, $url, true);
 	}
 }
