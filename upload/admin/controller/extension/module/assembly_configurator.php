@@ -35,6 +35,11 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
+			// Apply
+			if (isset($this->request->post['apply']) && $this->request->post['apply']) {
+				$this->response->redirect($this->getFullLink('extension/module/assembly_configurator'));
+			}
+
 			$this->response->redirect($this->getFullLink('marketplace/extension', ['type' => 'module']));
 		}
 
@@ -48,11 +53,11 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 		$data['breadcrumbs'] = $this->getBreadcrumbs('extension/module/assembly_configurator');
 		$data['data_version'] = $this->version;
 
+		// Urls
 		$data['url_action'] = $this->getFullLink('extension/module/assembly_configurator');
 		$data['url_cancel'] = $this->getFullLink('marketplace/extension', ['type' => 'module']);
 
-
-
+		// Main
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
@@ -80,19 +85,19 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 			: $this->config->get('module_assembly_configurator_status');
 
 		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_general', $data);
-    }
+	}
 
-    private function viewTabModifications() {
+	private function viewTabModifications() {
 		$data = [];
 
 		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_modifications', $data);
 	}
 
-    private function viewTabExtensions() {
+	private function viewTabExtensions() {
 		$data = [];
 
 		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_extensions', $data);
-    }
+	}
 
 	private function viewTabInfo() {
 		$data = [
