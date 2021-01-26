@@ -28,11 +28,19 @@
         <form action="{{ url_action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
           <ul class="nav nav-tabs">
             <li class="active"><a href="#tab-general" data-toggle="tab"><i class="fa fa-globe" aria-hidden="true"></i> {{ tab_general }}</a></li>
+            <li><a href="#tab-modifications" data-toggle="tab"><i class="fa fa-file-code-o" aria-hidden="true"></i> {{ tab_modifications }}</a></li>
+            <li><a href="#tab-extensions" data-toggle="tab"><i class="fa fa-files-o" aria-hidden="true"></i> {{ tab_extensions }}</a></li>
             <li><a href="#tab-info" data-toggle="tab"><i class="fa fa-info" aria-hidden="true"></i> {{ tab_info }}</a></li>
           </ul>
           <div class="tab-content">
             <div class="tab-pane fade in active" id="tab-general">
               {{ view_tab_general }}
+            </div>
+            <div class="tab-pane fade" id="tab-modifications">
+              {{ view_tab_modifications }}
+            </div>
+            <div class="tab-pane fade" id="tab-extensions">
+              {{ view_tab_extensions }}
             </div>
             <div class="tab-pane fade" id="tab-info">
               {{ view_tab_info }}

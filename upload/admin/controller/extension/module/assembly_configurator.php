@@ -58,8 +58,10 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 
 		// Views
-		$data['view_tab_info'] = $this->viewTabInfo();
 		$data['view_tab_general'] = $this->viewTabGeneral();
+		$data['view_tab_modifications'] = $this->viewTabModifications();
+		$data['view_tab_extensions'] = $this->viewTabExtensions();
+		$data['view_tab_info'] = $this->viewTabInfo();
 
 		$this->response->setOutput($this->load->view('extension/module/assembly_configurator', $data));
 	}
@@ -78,7 +80,19 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 			: $this->config->get('module_assembly_configurator_status');
 
 		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_general', $data);
+    }
+
+    private function viewTabModifications() {
+		$data = [];
+
+		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_modifications', $data);
 	}
+
+    private function viewTabExtensions() {
+		$data = [];
+
+		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_extensions', $data);
+    }
 
 	private function viewTabInfo() {
 		$data = [

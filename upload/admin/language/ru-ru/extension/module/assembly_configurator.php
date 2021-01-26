@@ -12,6 +12,8 @@ $_['text_version']     = 'Версия расширения';
 
 // Tabs
 $_['tab_general']      = 'Общие';
+$_['tab_modifications']      = 'Модификаторы';
+$_['tab_extensions']      = 'Расширения';
 $_['tab_info']         = 'Информация';
 
 // Entries
