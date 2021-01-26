@@ -1,6 +1,6 @@
 <?php
 // Heading
-$_['heading_title']    = '[OCN] Управление сборкой';
+$_['heading_title']    = '[OCN] Assembly Configurator';
 
 // Text
 $_['text_extension']   = 'Расширения';
