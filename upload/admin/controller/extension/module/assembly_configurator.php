@@ -68,7 +68,7 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 		$data['view_tab_extensions'] = $this->viewTabExtensions();
 		$data['view_tab_info'] = $this->viewTabInfo();
 
-		$this->response->setOutput($this->load->view('extension/module/assembly_configurator', $data));
+		$this->response->setOutput($this->load->view('extension/module/assembly_configurator/assembly_configurator', $data));
 	}
 
 	protected function validate() {
@@ -84,19 +84,19 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 			? $this->request->post['module_assembly_configurator_status']
 			: $this->config->get('module_assembly_configurator_status');
 
-		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_general', $data);
+		return $this->load->view('extension/module/assembly_configurator/assembly_configurator_general', $data);
 	}
 
 	private function viewTabModifications() {
 		$data = [];
 
-		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_modifications', $data);
+		return $this->load->view('extension/module/assembly_configurator/assembly_configurator_modifications', $data);
 	}
 
 	private function viewTabExtensions() {
 		$data = [];
 
-		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_extensions', $data);
+		return $this->load->view('extension/module/assembly_configurator/assembly_configurator_extensions', $data);
 	}
 
 	private function viewTabInfo() {
@@ -108,7 +108,7 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 			'data_version' => $this->version,
 		];
 
-		return $this->load->view('extension/module/assembly_configurator/tabs/assembly_configurator_info', $data);
+		return $this->load->view('extension/module/assembly_configurator/assembly_configurator_info', $data);
 	}
 
 	private function getBreadcrumbs($module) {
