@@ -7,6 +7,9 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 	private $author_link = 'https://forum.opencart.name/members/hkr.3/';
 	private $extension_link = 'https://forum.opencart.name/resources/';
 
+	private $dir_modifications = DIR_STORAGE . 'ocn/modifications/';
+	private $dir_extensions = DIR_STORAGE . 'ocn/extensions/';
+
 	public function __construct($registry) {
 		parent::__construct($registry);
 
@@ -24,7 +27,7 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 	}
 
 	public function index() {
-		$this->load->language('extension/module/assembly_configurator');
+		$this->load->language('extension/module/assembly_configurator/assembly_configurator');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -54,6 +57,7 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 		$data['data_version'] = $this->version;
 
 		// Urls
+		$data['url_extension'] = $this->getFullLink('extension/module/assembly_configurator');
 		$data['url_action'] = $this->getFullLink('extension/module/assembly_configurator');
 		$data['url_cancel'] = $this->getFullLink('marketplace/extension', ['type' => 'module']);
 
@@ -64,9 +68,10 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 
 		// Views
 		$data['view_tab_general'] = $this->viewTabGeneral();
-		$data['view_tab_modifications'] = $this->viewTabModifications();
 		$data['view_tab_extensions'] = $this->viewTabExtensions();
 		$data['view_tab_info'] = $this->viewTabInfo();
+
+		$data['view_tab_modifications'] = $this->load->controller('extension/module/assembly_configurator/assembly_configurator_modification');
 
 		$this->response->setOutput($this->load->view('extension/module/assembly_configurator/assembly_configurator', $data));
 	}
@@ -85,12 +90,6 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 			: $this->config->get('module_assembly_configurator_status');
 
 		return $this->load->view('extension/module/assembly_configurator/assembly_configurator_general', $data);
-	}
-
-	private function viewTabModifications() {
-		$data = [];
-
-		return $this->load->view('extension/module/assembly_configurator/assembly_configurator_modifications', $data);
 	}
 
 	private function viewTabExtensions() {
