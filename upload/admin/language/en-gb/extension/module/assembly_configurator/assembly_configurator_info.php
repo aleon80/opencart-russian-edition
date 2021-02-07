@@ -8,4 +8,4 @@ $_['text_author_name']    = 'Extension author';
 $_['text_version']        = 'Extension version';
 $_['text_version_re']     = 'Build version';
 $_['text_version_oc']     = 'Opencart version';
-$_['text_description']    = 'Description';
+$_['text_description']    = 'With this configurator you can install/update extensions and modifiers that come with this assembly.';
