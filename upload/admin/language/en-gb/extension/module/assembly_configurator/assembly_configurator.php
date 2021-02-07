@@ -10,3 +10,5 @@ $_['tab_info']          = 'Info';
 // Text
 $_['text_extension']    = 'Extensions';
 $_['text_edit']         = 'Build configuration';
+$_['text_developer']    = 'Developer Settings';
+$_['text_loading']      = 'Loading...';

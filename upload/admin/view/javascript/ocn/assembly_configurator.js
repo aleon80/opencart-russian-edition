@@ -114,4 +114,25 @@ $(document).ready(function () {
     unLockElement.find('i.fa').removeClass('fa-spinner fa-pulse').addClass(faClass);
     $('#form-modifications button[name=refresh]').prop('disabled', false);
   }
+
+  $('#button-setting').on('click', function() {
+    $.ajax({
+      url: $(this).data('url'),
+      dataType: 'html',
+      beforeSend: function() {
+        $('#button-setting').button('loading');
+      },
+      complete: function() {
+        $('#button-setting').button('reset');
+      },
+      success: function(html) {
+        $('#modal-developer').remove();
+        $('body').prepend('<div id="modal-developer" class="modal">' + html + '</div>');
+        $('#modal-developer').modal('show');
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+  });
 });

@@ -14,12 +14,30 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 
 	public function install() {
 		$this->load->model('setting/setting');
-
 		$data = [
 			'module_assembly_configurator_status' => 0
 		];
-
 		$this->model_setting_setting->editSetting('module_assembly_configurator', $data);
+
+		$this->load->model('setting/modification');
+		$file_full_path = DIR_STORAGE . 'ocn/ocn__assembly_configurator.xml';
+		if (is_file($file_full_path)) {
+			$xml = file_get_contents($file_full_path);
+			if ($xml) {
+				$dom = new DOMDocument('1.0', 'UTF-8');
+				$dom->loadXml($xml);
+				$modification = [
+					'name' => $dom->getElementsByTagName('name')->item(0)->nodeValue,
+					'code' => $dom->getElementsByTagName('code')->item(0)->nodeValue,
+					'author' => $dom->getElementsByTagName('author')->item(0)->nodeValue,
+					'version' => $dom->getElementsByTagName('version')->item(0)->nodeValue,
+					'link' => $dom->getElementsByTagName('link')->item(0)->nodeValue,
+					'xml' => $xml,
+					'status' => 1,
+				];
+				$this->model_setting_modification->addModification($modification);
+			}
+		}
 	}
 
 	public function index() {
@@ -33,6 +51,7 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 		$data['data_version'] = $this->getVersion();
 
 		// Urls
+		$data['url_developer'] = $this->getFullLink('common/developer');
 		$data['url_cancel'] = $this->getFullLink('marketplace/extension', ['type' => 'module']);
 
 		// Main
