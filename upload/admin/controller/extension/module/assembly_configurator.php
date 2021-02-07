@@ -1,13 +1,15 @@
 <?php
 class ControllerExtensionModuleAssemblyConfigurator extends Controller {
-	private $errors = [];
 	private $user_token;
-	private $version = '3.0.0.0';
+	private $assembly_configurator;
 
 	public function __construct($registry) {
 		parent::__construct($registry);
 
 		$this->user_token = $this->session->data['user_token'];
+
+		$this->load->model('setting/modification');
+		$this->assembly_configurator = $this->model_setting_modification->getModificationByCode('ocn__assembly_configurator');
 	}
 
 	public function install() {
@@ -47,7 +49,7 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 	}
 
 	public function getVersion() {
-		return $this->version;
+		return $this->assembly_configurator['version'];
 	}
 
 	private function getBreadcrumbs($module) {
