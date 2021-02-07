@@ -2,13 +2,10 @@
 class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 	private $errors = [];
 	private $user_token;
-	private $version = '3.0.3.6.RE9';
+	private $version = '3.0.0.0';
 	private $author_name = 'Hkr';
 	private $author_link = 'https://forum.opencart.name/members/hkr.3/';
 	private $extension_link = 'https://forum.opencart.name/resources/';
-
-	private $dir_modifications = DIR_STORAGE . 'ocn/modifications/';
-	private $dir_extensions = DIR_STORAGE . 'ocn/extensions/';
 
 	public function __construct($registry) {
 		parent::__construct($registry);
@@ -28,37 +25,15 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 
 	public function index() {
 		$this->load->language('extension/module/assembly_configurator/assembly_configurator');
-
 		$this->document->setTitle($this->language->get('heading_title'));
-
+        $this->document->addScript('view/javascript/ocn/assembly_configurator.js');
+		$this->document->addStyle('view/stylesheet/ocn/assembly_configurator.css');
 		$this->load->model('setting/setting');
-
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			$this->model_setting_setting->editSetting('module_assembly_configurator', $this->request->post);
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			// Apply
-			if (isset($this->request->post['apply']) && $this->request->post['apply']) {
-				$this->response->redirect($this->getFullLink('extension/module/assembly_configurator'));
-			}
-
-			$this->response->redirect($this->getFullLink('marketplace/extension', ['type' => 'module']));
-		}
-
-		// Errors
-		if (isset($this->errors['warning'])) {
-			$data['error_warning'] = $this->errors['warning'];
-		} else {
-			$data['error_warning'] = '';
-		}
 
 		$data['breadcrumbs'] = $this->getBreadcrumbs('extension/module/assembly_configurator');
 		$data['data_version'] = $this->version;
 
 		// Urls
-		$data['url_extension'] = $this->getFullLink('extension/module/assembly_configurator');
-		$data['url_action'] = $this->getFullLink('extension/module/assembly_configurator');
 		$data['url_cancel'] = $this->getFullLink('marketplace/extension', ['type' => 'module']);
 
 		// Main
@@ -68,20 +43,12 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 
 		// Views
 		$data['view_tab_general'] = $this->viewTabGeneral();
-		$data['view_tab_extensions'] = $this->viewTabExtensions();
 		$data['view_tab_info'] = $this->viewTabInfo();
 
 		$data['view_tab_modifications'] = $this->load->controller('extension/module/assembly_configurator/assembly_configurator_modification');
+		$data['view_tab_extensions'] = $this->load->controller('extension/module/assembly_configurator/assembly_configurator_extension');
 
 		$this->response->setOutput($this->load->view('extension/module/assembly_configurator/assembly_configurator', $data));
-	}
-
-	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'extension/module/assembly_configurator')) {
-			$this->errors['warning'] = $this->language->get('error_permission');
-		}
-
-		return !$this->errors;
 	}
 
 	private function viewTabGeneral() {
@@ -105,6 +72,8 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 			'data_author_name' => $this->author_name,
 			'url_author_link' => $this->author_link,
 			'data_version' => $this->version,
+			'data_version_re' => VERSION_RE,
+			'data_version_oc' => VERSION,
 		];
 
 		return $this->load->view('extension/module/assembly_configurator/assembly_configurator_info', $data);

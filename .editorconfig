@@ -15,6 +15,7 @@ trim_trailing_whitespace = false
 indent_size = 2
 
 [*.php]
+indent_style = tab
 indent_size = 4
 
 [*.twig]

@@ -6,12 +6,8 @@
       <div class="navbar-header">
         <a class="navbar-brand" href="{{ url_extension }}">{{ heading_title }}</a>
       </div>
-      <div>
-        <div class="btn-group navbar-right" role="group" aria-label="...">
-          <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_apply }}" class="btn btn-success navbar-btn" name="apply" value="1"><i class="fa fa-check"></i></button>
-          <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary navbar-btn"><i class="fa fa-save"></i></button>
-          <a href="{{ url_cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default navbar-btn"><i class="fa fa-reply"></i></a>
-        </div>
+      <div class="btn-group pull-right" role="group" aria-label="...">
+        <a href="{{ url_cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default navbar-btn"><i class="fa fa-reply"></i></a>
       </div>
     </div>
   </nav>
@@ -30,7 +26,7 @@
     </ol>
   </div>
 
-  <div class="container-fluid">
+  <main class="container-fluid" id="main">
     {% if error_warning %}
     <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
       <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -47,7 +43,7 @@
           <li><a href="#tab-extensions" data-toggle="tab"><i class="fa fa-files-o" aria-hidden="true"></i> {{ tab_extensions }}</a></li>
           <li><a href="#tab-info" data-toggle="tab"><i class="fa fa-info" aria-hidden="true"></i> {{ tab_info }}</a></li>
         </ul>
-        <div class="tab-content">
+        <div class="tab-content" id="tab-content">
           <div class="tab-pane fade in active" id="tab-general">
             {{ view_tab_general }}
           </div>
@@ -64,6 +60,6 @@
       </div>
       <div class="panel-footer">{{ heading_title }} v{{ data_version }}</div>
     </div>
-  </div>
+  </main>
 </div>
 {{ footer }}
