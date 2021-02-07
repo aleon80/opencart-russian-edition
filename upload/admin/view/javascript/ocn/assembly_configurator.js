@@ -74,17 +74,12 @@ $(document).ready(function () {
       data: {modifications: checkedModifications},
       dataType: 'json',
       success: function (response) {
-        let color = 'danger';
-        let status = 'warning';
-        let message = 'error';
-
         if (response.status) {
           color = response.color;
           status = response.text_status;
           message = response.text_message;
+          showAlert($('#main'), color, status, message);
         }
-
-        showAlert($('#main'), color, status, message);
       },
       error: function (xhr, ajaxOptions, thrownError) {
         alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);

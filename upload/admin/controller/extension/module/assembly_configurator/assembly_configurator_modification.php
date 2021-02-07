@@ -23,47 +23,39 @@ class ControllerExtensionModuleAssemblyConfiguratorAssemblyConfiguratorModificat
 
 	public function install() {
 		$this->load->language('extension/module/assembly_configurator/assembly_configurator_modifications');
+		$this->load->model('setting/modification');
+		$files = $this->request->post['modifications'];
+		$modifications = $this->prepareModifications();
 
-		if ($this->validateInstallModifications()) {
-			$this->load->model('setting/modification');
-			$files = $this->request->post['modifications'];
-			$modifications = $this->prepareModifications();
+		foreach($files as $file) {
+			$file_full_path = $this->dir_modifications . $file;
+			$modification_id = $modifications[$file]['modification_id'];
 
-			foreach($files as $file) {
-				$file_full_path = $this->dir_modifications . $file;
-				$modification_id = $modifications[$file]['modification_id'];
+			if (is_file($file_full_path)) {
+				$modification = [
+					'extension_install_id' => 0,
+					'name' => $modifications[$file]['name'],
+					'code' => $modifications[$file]['code'],
+					'author' => $modifications[$file]['author'],
+					'version' => $modifications[$file]['version'],
+					'link' => $modifications[$file]['link'],
+					'xml' => $modifications[$file]['xml'],
+					'status' => 1
+				];
 
-				if (is_file($file_full_path)) {
-					$modification = [
-						'extension_install_id' => 0,
-						'name' => $modifications[$file]['name'],
-						'code' => $modifications[$file]['code'],
-						'author' => $modifications[$file]['author'],
-						'version' => $modifications[$file]['version'],
-						'link' => $modifications[$file]['link'],
-						'xml' => $modifications[$file]['xml'],
-						'status' => 1
-					];
-
-					if ($modifications[$file]['available_update'] && $modification_id) {
-						$this->model_setting_modification->deleteModification($modification_id);
-						$modification['modification_id'] = $modification_id;
-					}
-
-					$this->model_setting_modification->addModification($modification);
+				if ($modifications[$file]['available_update'] && $modification_id) {
+					$this->model_setting_modification->deleteModification($modification_id);
+					$modification['modification_id'] = $modification_id;
 				}
-			}
 
-			$data['status'] = 'success';
-			$data['color'] = 'success';
-			$data['text_status'] = $this->language->get('text_success_status');
-			$data['text_message'] = $this->language->get('text_success_message');
-		} else {
-			$data['status'] = 'error';
-			$data['color'] = 'warning';
-			$data['text_status'] = $this->language->get('text_error_status');
-			$data['text_message'] = $this->language->get('text_error_message');
+				$this->model_setting_modification->addModification($modification);
+			}
 		}
+
+		$data['status'] = 'success';
+		$data['color'] = 'success';
+		$data['text_status'] = $this->language->get('text_success_status');
+		$data['text_message'] = $this->language->get('text_success_message');
 
 		$this->response->addHeader('Content-Type: application/json; charset=utf-8');
 		$this->response->setOutput(json_encode($data));
@@ -123,14 +115,6 @@ class ControllerExtensionModuleAssemblyConfiguratorAssemblyConfiguratorModificat
 		}
 
 		return $data;
-	}
-
-	private function validateInstallModifications() {
-		if (!$this->user->hasPermission('modify', 'extension/module/assembly_configurator/assembly_configurator_modification')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
-
-		return !$this->error;
 	}
 
 	private function getFullLink($module, $params = []) {
