@@ -40,10 +40,16 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 		}
 	}
 
+	public function uninstall()
+	{
+		$this->load->model('setting/modification');
+		$this->model_setting_modification->deleteModification($this->assembly_configurator['modification_id']);
+	}
+
 	public function index() {
 		$this->load->language('extension/module/assembly_configurator/assembly_configurator');
 		$this->document->setTitle($this->language->get('heading_title'));
-        $this->document->addScript('view/javascript/ocn/assembly_configurator.js');
+		$this->document->addScript('view/javascript/ocn/assembly_configurator.js');
 		$this->document->addStyle('view/stylesheet/ocn/assembly_configurator.css');
 		$this->load->model('setting/setting');
 

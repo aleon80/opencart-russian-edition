@@ -47,7 +47,7 @@ $(document).ready(function () {
   })
   function checkModificationsSelectedStatus() {
     let status = false;
-    if (checkedModifications.length == $('#form-modifications input[name*="modifications"]:not(:disabled)').length) {
+    if (checkedModifications.length != 0 && checkedModifications.length == $('#form-modifications input[name*="modifications"]:not(:disabled)').length) {
       status = true;
     }
     $('#form-modifications #form-modifications-select-all').prop('checked', status);
@@ -115,22 +115,25 @@ $(document).ready(function () {
     $('#form-modifications button[name=refresh]').prop('disabled', false);
   }
 
-  $('#button-setting').on('click', function() {
+  /**
+   * Developer Settings
+   */
+  $('#button-setting').on('click', function () {
     $.ajax({
       url: $(this).data('url'),
       dataType: 'html',
-      beforeSend: function() {
+      beforeSend: function () {
         $('#button-setting').button('loading');
       },
-      complete: function() {
+      complete: function () {
         $('#button-setting').button('reset');
       },
-      success: function(html) {
+      success: function (html) {
         $('#modal-developer').remove();
         $('body').prepend('<div id="modal-developer" class="modal">' + html + '</div>');
         $('#modal-developer').modal('show');
       },
-      error: function(xhr, ajaxOptions, thrownError) {
+      error: function (xhr, ajaxOptions, thrownError) {
         alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
       }
     });
