@@ -6,6 +6,7 @@
   <author>Hkr</author>
   <link>https://forum.opencart.name/</link>
 
+  <!-- Выводим ссылку на конфигуратор в меню -->
   <file path="admin/language/ru-ru/common/column_left.php">
     <operation>
       <search trim="true"><![CDATA[$_['text_dashboard']]]></search>
@@ -15,7 +16,6 @@
       ]]></add>
     </operation>
   </file>
-
   <file path="admin/language/en-gb/common/column_left.php">
     <operation>
       <search trim="true"><![CDATA[$_['text_dashboard']]]></search>
@@ -53,4 +53,33 @@
       ]]></add>
     </operation>
   </file>
+<!-- / -->
+
+<!-- Добавляем проверку для аякс запрос обновления модификаторов -->
+  <file path="admin/controller/marketplace/modification.php">
+    <operation>
+      <search><![CDATA[$this->response->redirect($this->url->link(!empty($data['redirect']) ? $data['redirect'] : 'marketplace/modification', 'user_token=' . $this->session->data['user_token'] . $url, true));]]></search>
+      <add position="before" trim="true"><![CDATA[
+        if (isset($this->request->get['configurator']) && $this->request->get['configurator'] === 'on') {
+          $this->response->addHeader('Content-Type: application/json; charset=utf-8');
+          $this->response->setOutput(json_encode(['success' => $this->language->get('text_success')]));
+        } else {
+      ]]></add>
+    </operation>
+    <operation>
+      <search><![CDATA[$this->response->redirect($this->url->link(!empty($data['redirect']) ? $data['redirect'] : 'marketplace/modification', 'user_token=' . $this->session->data['user_token'] . $url, true));]]></search>
+      <add position="after" trim="true"><![CDATA[
+        }
+      ]]></add>
+    </operation>
+    <operation>
+      <search><![CDATA[$this->getList();]]></search>
+      <add position="replace" trim="true" index="2"><![CDATA[
+        if (!isset($this->request->get['configurator'])) {
+          $this->getList();
+        }
+      ]]></add>
+    </operation>
+  </file>
+<!-- / -->
 </modification>

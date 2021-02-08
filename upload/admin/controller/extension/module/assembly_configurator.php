@@ -58,7 +58,8 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 
 		// Urls
 		$data['url_developer'] = $this->getFullLink('common/developer');
-		$data['url_cancel'] = $this->getFullLink('marketplace/extension', ['type' => 'module']);
+		$data['url_modification'] = $this->getFullLink('marketplace/modification/refresh', ['configurator' => 'on']);
+		$data['url_back'] = $this->getFullLink('marketplace/extension', ['type' => 'module']);
 
 		// Main
 		$data['header'] = $this->load->controller('common/header');

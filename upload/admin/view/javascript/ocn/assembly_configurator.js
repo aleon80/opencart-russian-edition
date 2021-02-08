@@ -2,11 +2,9 @@ $(document).ready(function () {
   let checkedModifications = [];
 
   /**
-   * Refresh
+   * Refresh list modifications
    */
-  // Action
   $('#tab-modifications').on('click', '#form-modifications button[name=refresh]', refreshModifications);
-  // Functions
   function refreshModifications() {
     checkedModifications = [];
     $('#form-modifications-table').html('');
@@ -61,7 +59,7 @@ $(document).ready(function () {
   }
 
   /**
-   * Install or/and Update
+   * Install/Update
    */
   // Action
   $('#tab-modifications').on('click', 'button[name=install]', installModifications);
@@ -91,30 +89,6 @@ $(document).ready(function () {
     });
   }
 
-  // Alerts
-  function showAlert(block, color, status, text) {
-    block.find('> .alert').hide('slow');
-    const alertBlock = '<div class="alert alert-' + color + ' alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>' + status + '</strong> ' + text + '</div>';
-    block.prepend(alertBlock);
-  }
-  function clearAlerts(block = false) {
-    if (block) {
-      block.find('> .alert').hide('slow');
-    } else {
-      $('.alert').hide('slow');
-    }
-  }
-
-  function lockElements(lockElement, faClass) {
-    lockElement.find('i.fa').removeClass(faClass).addClass('fa-spinner fa-pulse');
-    $('#form-modifications button[name=refresh]').prop('disabled', true);
-    $('#form-modifications button[name=install]').prop('disabled', true);
-  }
-  function unLockElements(unLockElement, faClass) {
-    unLockElement.find('i.fa').removeClass('fa-spinner fa-pulse').addClass(faClass);
-    $('#form-modifications button[name=refresh]').prop('disabled', false);
-  }
-
   /**
    * Developer Settings
    */
@@ -138,4 +112,58 @@ $(document).ready(function () {
       }
     });
   });
+
+  /**
+   * Refresh modifications
+   */
+  $('#button-modification').on('click', function () {
+    clearAlerts($('#main.container-fluid'));
+    const buttonRefreshModification = $(this);
+    $.ajax({
+      type: 'get',
+      url: $(this).data('url'),
+      dataType: 'json',
+      beforeSend: function() {
+        lockElements(buttonRefreshModification, 'fa-refresh');
+      },
+      complete: function() {
+        unLockElements(buttonRefreshModification, 'fa-refresh');
+      },
+      success: function(response) {
+        let alertMessage = response.success;
+        let alertBlock = '<div class="alert alert-success alert-dismissible"><i class="fa fa-exclamation-circle"></i>' + alertMessage + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>';
+        $('#main.container-fluid').prepend(alertBlock);
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+  })
+
+  // Alerts
+  function showAlert(block, color, status, text) {
+    block.find('> .alert').hide('slow');
+    const alertBlock = '<div class="alert alert-' + color + ' alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>' + status + '</strong> ' + text + '</div>';
+    block.prepend(alertBlock);
+  }
+  function clearAlerts(block = false) {
+    if (block) {
+      block.find('> .alert').hide('slow');
+    } else {
+      $('.alert').hide('slow');
+    }
+  }
+
+  // Lock/Unlock
+  function lockElements(lockElement, faClass) {
+    lockElement.find('i.fa').removeClass(faClass).addClass('fa-spinner fa-pulse');
+    $('#form-modifications button[name=refresh]').prop('disabled', true);
+    $('#form-modifications button[name=install]').prop('disabled', true);
+    $('#button-modification').prop('disabled', true);
+  }
+  function unLockElements(unLockElement, faClass) {
+    unLockElement.find('i.fa').removeClass('fa-spinner fa-pulse').addClass(faClass);
+    $('#form-modifications button[name=refresh]').prop('disabled', false);
+    $('#button-modification').prop('disabled', false);
+  }
 });
