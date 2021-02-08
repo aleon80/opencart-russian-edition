@@ -27,6 +27,7 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 				$dom = new DOMDocument('1.0', 'UTF-8');
 				$dom->loadXml($xml);
 				$modification = [
+					'extension_install_id' => 0,
 					'name' => $dom->getElementsByTagName('name')->item(0)->nodeValue,
 					'code' => $dom->getElementsByTagName('code')->item(0)->nodeValue,
 					'author' => $dom->getElementsByTagName('author')->item(0)->nodeValue,
