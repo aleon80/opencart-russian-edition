@@ -1,5 +1,6 @@
 $(document).ready(function () {
   let checkedModifications = [];
+  let checkedExtensions = [];
 
   /**
    * Refresh list modifications
@@ -88,6 +89,105 @@ $(document).ready(function () {
       }
     });
   }
+
+  /**
+   * Extensions
+   */
+
+  /**
+   * Refresh list extensions
+   */
+  $('#tab-extensions').on('click', '#form-extensions button[name=refresh]', refreshExtensions);
+  function refreshExtensions() {
+    checkedExtensions = [];
+    $('#form-extensions-table').html('');
+    lockElements($('#form-extensions button[name=refresh]'), 'fa-refresh');
+
+    $("#form-extensions-table").load(
+      $('#form-extensions').data('refresh'),
+      function (response, status, xhr) {
+        if (status === "error") {
+          showAlert($('#main'), 'danger', 'Error!', msg + xhr.status + " " + xhr.statusText);
+        }
+        unLockElements($('#form-extensions button[name=refresh]'), 'fa-refresh');
+        checkExtensionsButtonsStatus();
+      });
+  }
+
+
+  /**
+   * Selected extensions
+   */
+  $('#tab-extensions').on('click', '#form-extensions-select-all', function () {
+    checkedExtensions = [];
+    $('#form-extensions input[name*="extensions"]:not(:disabled)').prop('checked', this.checked);
+    if (this.checked) {
+      $('#form-extensions input[name*="extensions"]:checked').each(function() {
+        checkedExtensions.push(this.value);
+      });
+    }
+    checkExtensionsSelectedStatus();
+    checkExtensionsButtonsStatus();
+  })
+  $('#tab-extensions').on('change', 'input[name*="extensions"]', function () {
+    if (this.checked) {
+      checkedExtensions.push(this.value);
+    } else {
+      checkedExtensions.splice(checkedExtensions.indexOf(this.value), 1);
+    }
+    checkExtensionsSelectedStatus();
+    checkExtensionsButtonsStatus();
+  })
+  function checkExtensionsSelectedStatus() {
+    let status = false;
+    if (checkedExtensions.length !== 0 && checkedExtensions.length === $('#form-extensions input[name*="extensions"]:not(:disabled)').length) {
+      status = true;
+    }
+    $('#form-extensions #form-extensions-select-all').prop('checked', status);
+  }
+  function checkExtensionsButtonsStatus() {
+    let status = true;
+    if (checkedExtensions.length > 0) {
+      status = false;
+    }
+    $('#form-extensions #form-extensions-button-install').attr('disabled', status);
+  }
+
+  /**
+   * Install/Update
+   */
+  // Action
+  $('#tab-extensions').on('click', 'button[name=install]', installExtensions);
+  // Function
+  function installExtensions() {
+    lockElements($('#form-extensions button[name=install]'), 'fa-plus');
+    $.ajax({
+      type: 'post',
+      url: $('#form-extensions').attr('action'),
+      data: { extensions: checkedExtensions },
+      dataType: 'json',
+      success: function (response) {
+        if (response.status) {
+          color = response.color;
+          status = response.text_status;
+          message = response.text_message;
+          showAlert($('#main'), color, status, message);
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      },
+      complete: function () {
+        refreshExtensions();
+        unLockElements($('#form-extensions button[name=install]'), 'fa-plus');
+      }
+    });
+  }
+
+
+  /**
+   * General
+   */
 
   /**
    * Developer Settings
