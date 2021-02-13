@@ -35,7 +35,7 @@ class ControllerExtensionModuleAssemblyConfiguratorAssemblyConfiguratorGeneral e
 		return $data;
 	}
 
-	public function getBreadcrumbs($module) {
+	public function getBreadcrumbs($data = []) {
 		return [
 			[
 				'text' => $this->language->get('text_home'),
@@ -47,7 +47,7 @@ class ControllerExtensionModuleAssemblyConfiguratorAssemblyConfiguratorGeneral e
 			],
 			[
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->getFullLink(['module' => $module])
+				'href' => $this->getFullLink(['module' => $data['module']])
 			]
 		];
 	}

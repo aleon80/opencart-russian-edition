@@ -7,11 +7,6 @@ class ControllerExtensionModuleAssemblyConfiguratorAssemblyConfiguratorExtension
 
 		$extensions = $this->checkInstalledExtensions();
 
-//		echo '<pre>';
-//		var_dump($extensions);
-//		echo '</pre>';
-//		exit();
-
 		$data = [
 			'url_install' => $this->load->controller(
 				'extension/module/assembly_configurator/assembly_configurator_general/getFullLink',

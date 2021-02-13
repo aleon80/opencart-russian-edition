@@ -1,14 +1,21 @@
 <?php
 class ControllerExtensionModuleAssemblyConfiguratorAssemblyConfiguratorModification extends Controller {
-	private $error = [];
 	private $dir_modifications = DIR_STORAGE . 'ocn/modifications/';
 
 	public function index() {
 		$this->load->language('extension/module/assembly_configurator/assembly_configurator_modifications');
+
 		$modifications = $this->prepareModifications();
+
 		$data = [
-			'url_install' => $this->getFullLink('extension/module/assembly_configurator/assembly_configurator_modification/install'),
-			'url_refresh' => $this->getFullLink('extension/module/assembly_configurator/assembly_configurator_modification/refresh'),
+			'url_install' => $this->load->controller(
+				'extension/module/assembly_configurator/assembly_configurator_general/getFullLink',
+				['module' => 'extension/module/assembly_configurator/assembly_configurator_modification/install']
+			),
+			'url_refresh' => $this->load->controller(
+				'extension/module/assembly_configurator/assembly_configurator_general/getFullLink',
+				['module' => 'extension/module/assembly_configurator/assembly_configurator_modification/refresh']
+			),
 			'table' => $this->load->view('extension/module/assembly_configurator/assembly_configurator_modifications_table', ['modifications' => $modifications])
 		];
 
@@ -17,13 +24,17 @@ class ControllerExtensionModuleAssemblyConfiguratorAssemblyConfiguratorModificat
 
 	public function refresh() {
 		$this->load->language('extension/module/assembly_configurator/assembly_configurator_modifications');
+
 		$data['modifications'] = $this->prepareModifications();
+
 		$this->response->setOutput($this->load->view('extension/module/assembly_configurator/assembly_configurator_modifications_table', $data));
 	}
 
 	public function install() {
 		$this->load->language('extension/module/assembly_configurator/assembly_configurator_modifications');
+
 		$this->load->model('setting/modification');
+
 		$files = $this->request->post['modifications'];
 		$modifications = $this->prepareModifications();
 
@@ -63,67 +74,55 @@ class ControllerExtensionModuleAssemblyConfiguratorAssemblyConfiguratorModificat
 
 	private function prepareModifications() {
 		$this->load->model('setting/modification');
-		$files = new FilesystemIterator($this->dir_modifications);
-		$xmls = new RegexIterator($files, '/.(xml)$/');
+		$xml_columns = ['name', 'code', 'author', 'version', 'link'];
+		$files = $this->load->controller(
+			'extension/module/assembly_configurator/assembly_configurator_general/getFiles',
+			['pattern' => '/.(xml)$/', 'path' => 'ocn/modifications/', 'type' => 'modifications']
+		);
 
-		$data = [];
-		foreach($xmls as $file) {
-			$file_name = $file->getFilename();
-			$file_full_path = $this->dir_modifications . $file_name;
+		$modifications = [];
+		foreach($files as $file_name => $path) {
+			$xml = file_get_contents($path);
 
-			if (is_file($file_full_path)) {
-				$xml = file_get_contents($file_full_path);
-				if ($xml) {
-					$dom = new DOMDocument('1.0', 'UTF-8');
-					$dom->loadXml($xml);
+			if ($xml) {
+				$dom = new DOMDocument('1.0', 'UTF-8');
+				$dom->loadXml($xml);
 
-					$name = $dom->getElementsByTagName('name')->item(0)->nodeValue;
-					$code = $dom->getElementsByTagName('code')->item(0)->nodeValue;
-					$author = $dom->getElementsByTagName('author')->item(0)->nodeValue;
-					$version = $dom->getElementsByTagName('version')->item(0)->nodeValue;
-					$link = $dom->getElementsByTagName('link')->item(0)->nodeValue;
+				$xml_data = [];
+				foreach ($xml_columns as $xml_column) {
+					$xml_data[$xml_column] = $dom->getElementsByTagName($xml_column)->item(0)->nodeValue;
+				}
 
-					$data[$file_name] = [
-						'name'                   => $name,
-						'code'                   => $code,
-						'author'                 => $author,
-						'version'                => $version,
-						'link'                   => $link,
-						'xml'                    => $xml,
-						'status'                 => 1,
-						'modification_id'        => 0,
-						'installed'              => '',
-						'available_installation' => true,
-						'available_update'       => false,
-						'text_status'            => $this->language->get('text_available_installation'),
-					];
+				$modifications[$file_name] = [
+					'name'                   => $xml_data['name'],
+					'code'                   => $xml_data['code'],
+					'author'                 => $xml_data['author'],
+					'version'                => $xml_data['version'],
+					'link'                   => $xml_data['link'],
+					'xml'                    => $xml,
+					'status'                 => 1,
+					'modification_id'        => 0,
+					'installed'              => '',
+					'available_installation' => true,
+					'available_update'       => false,
+					'text_status'            => $this->language->get('text_available_installation'),
+				];
 
-					$installed_modification = $this->model_setting_modification->getModificationByCode($dom->getElementsByTagName('code')->item(0)->nodeValue);
+				$installed_modification = $this->model_setting_modification->getModificationByCode($dom->getElementsByTagName('code')->item(0)->nodeValue);
 
-					if ($installed_modification) {
-						$status_versions = $version <= $installed_modification['version'];
-						$text_status = $status_versions ? 'text_available_installed' : 'text_available_update';
+				if ($installed_modification) {
+					$status_versions = $xml_data['version'] <= $installed_modification['version'];
+					$text_status = $status_versions ? 'text_available_installed' : 'text_available_update';
 
-						$data[$file_name]['modification_id'] = $installed_modification['modification_id'];
-						$data[$file_name]['installed'] = $installed_modification['version'];
-						$data[$file_name]['available_installation'] = false;
-						$data[$file_name]['available_update'] = !$status_versions;
-						$data[$file_name]['text_status'] = $this->language->get($text_status);
-					}
+					$modifications[$file_name]['modification_id'] = $installed_modification['modification_id'];
+					$modifications[$file_name]['installed'] = $installed_modification['version'];
+					$modifications[$file_name]['available_installation'] = false;
+					$modifications[$file_name]['available_update'] = !$status_versions;
+					$modifications[$file_name]['text_status'] = $this->language->get($text_status);
 				}
 			}
 		}
 
-		return $data;
-	}
-
-	private function getFullLink($module, $params = []) {
-		$url = '';
-		foreach ($params as $key => $value) {
-			$url .= '&' . $key . '=' . $value;
-		}
-		$url .= '&user_token=' . $this->session->data['user_token'];
-
-		return $this->url->link($module, $url, true);
+		return $modifications;
 	}
 }

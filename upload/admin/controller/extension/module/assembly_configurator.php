@@ -54,13 +54,29 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 		$this->document->addStyle('view/stylesheet/ocn/assembly_configurator.css');
 		$this->load->model('setting/setting');
 
-		$data['breadcrumbs'] = $this->getBreadcrumbs('extension/module/assembly_configurator');
-		$data['data_version'] = $this->getVersion();
+		$data['breadcrumbs'] = $this->load->controller(
+			'extension/module/assembly_configurator/assembly_configurator_general/getBreadcrumbs',
+			['module' => 'extension/module/assembly_configurator']
+		);
+		$data['data_version'] = $this->load->controller('extension/module/assembly_configurator/assembly_configurator_general/getVersion');
 
 		// Urls
-		$data['url_developer'] = $this->getFullLink('common/developer');
-		$data['url_modification'] = $this->getFullLink('marketplace/modification/refresh', ['configurator' => 'on']);
-		$data['url_back'] = $this->getFullLink('marketplace/extension', ['type' => 'module']);
+		$data['url_extension'] = $this->load->controller(
+			'extension/module/assembly_configurator/assembly_configurator_general/getFullLink',
+			['module' => 'extension/module/assembly_configurator']
+		);
+		$data['url_developer'] = $this->load->controller(
+			'extension/module/assembly_configurator/assembly_configurator_general/getFullLink',
+			['module' => 'common/developer']
+		);
+		$data['url_modification'] = $this->load->controller(
+			'extension/module/assembly_configurator/assembly_configurator_general/getFullLink',
+			['module' => 'marketplace/modification/refresh', 'params' => ['configurator' => 'on']]
+		);
+		$data['url_back'] = $this->load->controller(
+			'extension/module/assembly_configurator/assembly_configurator_general/getFullLink',
+			['module' => 'marketplace/extension', 'params' => ['type' => 'module']]
+		);
 
 		// Main
 		$data['header'] = $this->load->controller('common/header');
@@ -73,36 +89,5 @@ class ControllerExtensionModuleAssemblyConfigurator extends Controller {
 		$data['view_tab_extensions'] = $this->load->controller('extension/module/assembly_configurator/assembly_configurator_extension');
 
 		$this->response->setOutput($this->load->view('extension/module/assembly_configurator/assembly_configurator', $data));
-	}
-
-	public function getVersion() {
-		return $this->assembly_configurator['version'];
-	}
-
-	private function getBreadcrumbs($module) {
-		return [
-			[
-				'text' => $this->language->get('text_home'),
-				'href' => $this->getFullLink('common/dashboard')
-			],
-			[
-				'text' => $this->language->get('text_extension'),
-				'href' => $this->getFullLink('marketplace/extension', ['type' => 'module'])
-			],
-			[
-				'text' => $this->language->get('heading_title'),
-				'href' => $this->getFullLink($module)
-			]
-		];
-	}
-
-	private function getFullLink($module, $params = []) {
-		$url = '';
-		foreach ($params as $key => $value) {
-			$url .= '&' . $key . '=' . $value;
-		}
-		$url .= '&user_token=' . $this->user_token;
-
-		return $this->url->link($module, $url, true);
 	}
 }
